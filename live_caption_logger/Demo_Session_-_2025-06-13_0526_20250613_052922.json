@@ -1,0 +1,83 @@
+{
+  "session": {
+    "id": 1,
+    "title": "Demo Session - 2025-06-13 05:26",
+    "start_time": "2025-06-13T05:26:41.582200",
+    "end_time": "2025-06-13T05:26:45.612670",
+    "status": "completed",
+    "metadata": {
+      "demo": true,
+      "created_by": "Live Caption Logger Demo"
+    }
+  },
+  "transcript": [
+    {
+      "text_id": "01074a08",
+      "content": "Xin chào và chào mừng đến với cuộc họp hôm nay",
+      "timestamp": "2025-06-13T05:26:41.584922",
+      "confidence": 87.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "84a9ea29",
+      "content": "Chúng ta sẽ thảo luận về dự án Live Caption Logger",
+      "timestamp": "2025-06-13T05:26:42.087315",
+      "confidence": 89.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "ca494b8e",
+      "content": "Đây là một ứng dụng giúp ghi lại và lưu trữ bản ghi từ Live Caption",
+      "timestamp": "2025-06-13T05:26:42.590591",
+      "confidence": 91.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "3e96474f",
+      "content": "Ứng dụng sử dụng công nghệ OCR để đọc văn bản từ màn hình",
+      "timestamp": "2025-06-13T05:26:43.093982",
+      "confidence": 93.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "292fa410",
+      "content": "Sau đó xử lý và lưu trữ vào cơ sở dữ liệu",
+      "timestamp": "2025-06-13T05:26:43.597905",
+      "confidence": 95.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "d2008ba0",
+      "content": "Người dùng có thể xuất transcript ra nhiều định dạng khác nhau",
+      "timestamp": "2025-06-13T05:26:44.102310",
+      "confidence": 97.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "8502b888",
+      "content": "Cảm ơn mọi người đã tham gia cuộc họp",
+      "timestamp": "2025-06-13T05:26:44.606217",
+      "confidence": 99.0,
+      "is_incremental": false
+    },
+    {
+      "text_id": "f920cbfd",
+      "content": "Hẹn gặp lại trong cuộc họp tiếp theo",
+      "timestamp": "2025-06-13T05:26:45.109852",
+      "confidence": 101.0,
+      "is_incremental": false
+    }
+  ],
+  "statistics": {
+    "total_entries": 8,
+    "total_words": 93,
+    "total_characters": 396,
+    "average_confidence": 94.0,
+    "duration_seconds": 4.03047
+  },
+  "export_info": {
+    "exported_at": "2025-06-13T05:29:22.188391",
+    "format": "json",
+    "version": "1.0"
+  }
+}

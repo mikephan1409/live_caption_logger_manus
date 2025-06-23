@@ -1,0 +1,32 @@
+1
+00:00:00,002 --> 00:00:03,002
+Xin chào và chào mừng đến với cuộc họp hôm nay
+
+2
+00:00:00,505 --> 00:00:03,505
+Chúng ta sẽ thảo luận về dự án Live Caption Logger
+
+3
+00:00:01,008 --> 00:00:04,008
+Đây là một ứng dụng giúp ghi lại và lưu trữ bản ghi từ Live Caption
+
+4
+00:00:01,511 --> 00:00:04,511
+Ứng dụng sử dụng công nghệ OCR để đọc văn bản từ màn hình
+
+5
+00:00:02,015 --> 00:00:05,015
+Sau đó xử lý và lưu trữ vào cơ sở dữ liệu
+
+6
+00:00:02,520 --> 00:00:05,520
+Người dùng có thể xuất transcript ra nhiều định dạng khác nhau
+
+7
+00:00:03,024 --> 00:00:06,024
+Cảm ơn mọi người đã tham gia cuộc họp
+
+8
+00:00:03,527 --> 00:00:06,527
+Hẹn gặp lại trong cuộc họp tiếp theo
+

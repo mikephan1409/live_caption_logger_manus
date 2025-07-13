@@ -1,154 +1,130 @@
 # File chính để chạy ứng dụng Live Caption Logger
-
 import configparser
 import logging
-import time
-from pathlib import Path
+import queue
 import sys
+import time
+import sounddevice as sd
+from pathlib import Path
 
-# Giả lập các module từ dự án gốc để mã nguồn có tính minh họa
-# In a real scenario, these would be the actual project modules
-class OCRProcessor:
-    def __init__(self, tesseract_path, language):
-        self.tesseract_path = tesseract_path
-        self.language = language
-        # In a real app, you would set pytesseract.pytesseract.tesseract_cmd here
-        if not Path(self.tesseract_path).is_file():
-            raise FileNotFoundError(f"Tesseract executable not found at: {self.tesseract_path}")
-        logging.info(f"OCR Processor initialized for language: '{self.language}'")
+# Placeholder for the actual Whisper transcription model
+class WhisperModel:
+    def __init__(self, model_name):
+        logging.info(f"Loading Whisper model: {model_name}...")
+        self.model_name = model_name
+        # In a real application, this is where you would load the actual model, e.g.:
+        # self.model = whisper.load_model(model_name)
+        logging.info("Whisper model loaded successfully (simulation).")
 
-    def recognize(self, image):
-        # Giả lập quá trình OCR
-        logging.debug("Performing OCR on image.")
-        return "Đây là một phụ đề mẫu được nhận dạng."
+    def transcribe(self, audio_data):
+        # Simulate transcription
+        logging.debug(f"Transcribing audio data of shape: {audio_data.shape}")
+        # In a real application, you would call:
+        # return self.model.transcribe(audio_data, fp16=torch.cuda.is_available())['text']
+        return "This is a simulated live transcription."
 
-class ScreenCapture:
-    def __init__(self, region=None):
-        self.region = region
-        logging.info(f"Screen Capture initialized for region: {self.region or 'Full Screen'}")
+def setup_logging(config):
+    """Configures the logging system based on settings in the config file."""
+    log_file = config.get('Logging', 'log_file', fallback='app.log')
+    log_level_str = config.get('Logging', 'log_level', fallback='INFO').upper()
+    log_level = getattr(logging, log_level_str, logging.INFO)
 
-    def capture(self):
-        # Giả lập chụp ảnh màn hình
-        logging.debug("Capturing screen.")
-        return "image_data_placeholder"
-
-class CaptionLogger:
-    def __init__(self, db_path):
-        self.db_path = db_path
-        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
-        logging.info(f"Caption Logger initialized with database: {self.db_path}")
-
-    def log(self, text):
-        # Giả lập ghi log vào DB
-        logging.info(f"Logging caption: '{text}'")
-
-def setup_logging(log_file, log_level_str):
-    """Cấu hình hệ thống logging để ghi vào file và console."""
-    log_level = getattr(logging, log_level_str.upper(), logging.INFO)
+    Path(log_file).parent.mkdir(parents=True, exist_ok=True)
     
-    root_logger = logging.getLogger()
-    root_logger.setLevel(log_level)
-
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    try:
-        file_handler = logging.FileHandler(log_file, encoding='utf-8')
-        file_handler.setFormatter(formatter)
-        root_logger.addHandler(file_handler)
-    except Exception as e:
-        print(f"Error setting up file logger '{log_file}': {e}")
-
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    root_logger.addHandler(console_handler)
-
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, encoding='utf-8'),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
     logging.info("Logging configured.")
 
 def load_config(path="config.ini"):
-    """Tải và phân tích tệp cấu hình."""
-    if not Path(path).is_file():
-        logging.critical(f"Configuration file not found: {path}")
-        raise FileNotFoundError(f"Configuration file not found: {path}")
+    """Loads and validates the configuration file."""
+    config_path = Path(path)
+    if not config_path.is_file():
+        logging.critical(f"FATAL: Configuration file not found at '{path}'.")
+        logging.critical("Please run 'python list_devices.py' to create and configure it.")
+        raise FileNotFoundError(f"Configuration file '{path}' not found.")
     
     config = configparser.ConfigParser()
     config.read(path, encoding='utf-8')
-    logging.info(f"Configuration loaded from {path}")
+    logging.info(f"Configuration loaded from '{path}'.")
     return config
 
-def initialize_dependencies(config):
-    """Khởi tạo các thành phần cốt lõi dựa trên cấu hình."""
-    try:
-        tesseract_path = config.get('Tesseract', 'tesseract_cmd_path')
-        ocr_language = config.get('OCR', 'language')
-        ocr_processor = OCRProcessor(tesseract_path, ocr_language)
-
-        capture_region_str = config.get('ScreenCapture', 'capture_region', fallback=None)
-        capture_region = tuple(map(int, capture_region_str.split(','))) if capture_region_str else None
-        screen_capture = ScreenCapture(region=capture_region)
-
-        db_path = config.get('Logging', 'database_path')
-        caption_logger = CaptionLogger(db_path)
-        
-        return ocr_processor, screen_capture, caption_logger
-
-    except (configparser.NoSectionError, configparser.NoOptionError) as e:
-        logging.error(f"Configuration error in config.ini: {e}")
-        raise
-    except FileNotFoundError as e:
-        logging.error(f"Initialization failed: {e}")
-        raise
-    except Exception as e:
-        logging.error(f"An unexpected error occurred during initialization: {e}", exc_info=True)
-        raise
-
-def main_loop(ocr, capture, logger, frequency_hz):
-    """Vòng lặp chính của ứng dụng để chụp, xử lý và ghi log."""
-    interval = 1.0 / frequency_hz
-    last_processed_text = ""
-    
-    logging.info(f"Starting main loop with frequency: {frequency_hz}Hz (Interval: {interval:.2f}s)")
-    
-    while True:
-        try:
-            start_time = time.time()
-            
-            image = capture.capture()
-            current_text = ocr.recognize(image)
-            
-            if current_text and current_text != last_processed_text:
-                logger.log(current_text)
-                last_processed_text = current_text
-            
-            elapsed_time = time.time() - start_time
-            sleep_time = max(0, interval - elapsed_time)
-            time.sleep(sleep_time)
-
-        except KeyboardInterrupt:
-            logging.info("Process interrupted by user. Exiting.")
-            break
-        except Exception as e:
-            logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
-            time.sleep(5) 
+def audio_callback(indata, frames, time, status):
+    """This is called (from a separate thread) for each audio block."""
+    if status:
+        logging.warning(f"Audio stream status: {status}")
+    q.put(indata.copy())
 
 if __name__ == "__main__":
-    log_file = 'app.log'
+    stream = None  # Initialize stream to None
     try:
+        # --- 1. Load Configuration and Setup Logging ---
         config = load_config("config.ini")
+        setup_logging(config)
+
+        # --- 2. Initialize Dependencies ---
+        model_name = config.get('Whisper', 'model_name', fallback='base.en')
+        whisper_model = WhisperModel(model_name)
+
+        # --- 3. Setup Audio Stream ---
+        samplerate = config.getint('Audio', 'samplerate')
+        channels = config.getint('Audio', 'channels')
+        device_id = config.getint('Audio', 'device')
         
-        log_file = config.get('Logging', 'log_file', fallback='app.log')
-        log_level = config.get('Logging', 'log_level', fallback='INFO')
-        setup_logging(log_file, log_level)
+        logging.info(f"Attempting to open audio stream on device ID {device_id}...")
+        q = queue.Queue()
         
-        ocr_processor, screen_capture, caption_logger = initialize_dependencies(config)
-        
-        capture_frequency = config.getfloat('ScreenCapture', 'capture_frequency_hz', fallback=2.0)
-        main_loop(ocr_processor, screen_capture, caption_logger, capture_frequency)
-        
+        stream = sd.InputStream(
+            samplerate=samplerate,
+            channels=channels,
+            device=device_id,
+            callback=audio_callback
+        )
+        stream.start()
+        logging.info("Audio stream started successfully.")
+
+        # --- 4. Main Application Loop ---
+        print("\n--- Live Captioning Active --- (Press Ctrl+C to stop)")
+        while True:
+            # In a real app, you would collect audio from the queue,
+            # process it, and pass it to the Whisper model.
+            audio_chunk = q.get()
+            transcription = whisper_model.transcribe(audio_chunk)
+            print(f"\r>> {transcription}", end="", flush=True)
+            # This is a simplified loop. A real implementation would handle
+            # audio chunking, silence detection, etc.
+            time.sleep(0.1)
+
     except FileNotFoundError as e:
-        print(f"CRITICAL ERROR: {e}. Please ensure 'config.ini' exists and is correctly configured.")
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except (configparser.NoSectionError, configparser.NoOptionError) as e:
+        logging.critical(f"Configuration error in 'config.ini': {e}")
+        print(f"Error in 'config.ini': {e}. Please check the file structure.", file=sys.stderr)
+        sys.exit(1)
+    except sd.PortAudioError as e:
+        logging.critical(f"SoundDevice Error: {e}. Could not open audio stream.")
+        logging.critical("Is the correct audio 'device' ID set in config.ini? Run list_devices.py to check.")
+        print(f"\nAudio Error: {e}\nPlease check your audio device configuration.", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        logging.critical(f"Application failed to start.", exc_info=True)
-        print(f"An unrecoverable error occurred. Check '{log_file}' for details.")
+        logging.critical("An unexpected error occurred during startup or execution.", exc_info=True)
+        print(f"\nAn unexpected error occurred: {e}", file=sys.stderr)
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n--- Exiting gracefully ---")
+    finally:
+        if stream is not None and stream.active:
+            logging.info("Stopping audio stream.")
+            stream.stop()
+            stream.close()
+            logging.info("Audio stream closed.")
+        else:
+            logging.info("Audio stream was not active. No cleanup needed.")
+
 

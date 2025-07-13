@@ -15,6 +15,25 @@ Một ứng dụng mạnh mẽ để ghi lại và lưu trữ bản ghi từ tí
 - 🖥️ **Giao diện thân thiện** - GUI dễ sử dụng với Tkinter
 - 📊 **Báo cáo thống kê** - Phân tích chi tiết về nội dung transcript
 
+- # Live Caption Logger (updated)
+
+A real-time audio transcription and logging tool powered by OpenAI's Whisper and the SoundDevice library. It captures audio from a selected microphone, transcribes it live, and saves the output.
+
+## Features
+
+-   **Live Transcription:** Captures audio from any input device and provides real-time captions.
+-   **Configurable:** Easily change settings like the audio device, Whisper model, and logging levels via a simple `config.ini` file.
+-   **Device Selection Helper:** Includes a script (`list_devices.py`) to easily find and set the correct audio device ID.
+-   **Robust Logging:** Keeps detailed logs for easy debugging.
+
+## Requirements
+
+-   Python 3.8+
+-   A working microphone
+
+The required Python packages are listed in `requirements.txt`.
+
+
 ## 🚀 Bắt đầu nhanh
 
 ### Yêu cầu hệ thống
